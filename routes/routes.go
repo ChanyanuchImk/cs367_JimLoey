@@ -15,4 +15,5 @@ func SetupRoutes(r *gin.Engine) {
 
 	auth.Use(middleware.AuthMiddleware())
 
+	auth.GET("/booking/:res_id", handlers.GetBookings)
 }
