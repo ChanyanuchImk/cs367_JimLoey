@@ -15,4 +15,6 @@ func SetupRoutes(r *gin.Engine) {
 
 	auth.Use(middleware.AuthMiddleware())
 
+	auth.GET("/bookings/queue", handlers.GetQueues)
+
 }
