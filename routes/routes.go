@@ -9,9 +9,6 @@ import (
 
 func SetupRoutes(r *gin.Engine) {
 
-	// นำ ErrorHandler มาดักจับทุกเส้นทาง
-	r.Use(middleware.ErrorHandler())
-
 	r.POST("/login", handlers.Login)
 
 	auth := r.Group("/")
