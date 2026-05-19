@@ -15,4 +15,9 @@ func SetupRoutes(r *gin.Engine) {
 
 	auth.Use(middleware.AuthMiddleware())
 
+<<<<<<< Updated upstream
+=======
+	auth.GET("/booking/:user_id", handlers.GetBookings)
+
+>>>>>>> Stashed changes
 }
