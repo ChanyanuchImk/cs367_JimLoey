@@ -22,4 +22,9 @@ func SetupRoutes(r *gin.Engine) {
 	auth.POST("/restaurants", handlers.CreateRestaurant)
 	auth.GET("/bookings/queue", handlers.GetQueues)
 
+<<<<<<< Updated upstream
+=======
+	auth.GET("/booking/:user_id", handlers.GetBookings)
+
+>>>>>>> Stashed changes
 }
