@@ -24,6 +24,9 @@ type Booking struct {
 // GET /booking/{user_id}
 func GetBookings(c *gin.Context) {
 	userID := c.Param("user_id")
+// GET /booking/{res_id}
+func GetBookings(c *gin.Context) {
+	resID := c.Param("res_id")
 
 	query := `
 		SELECT booking_id, user_id, restaurant_id, table_id, booking_date, start_time, end_time, number_of_people, total_price, status, created_at
@@ -32,6 +35,10 @@ func GetBookings(c *gin.Context) {
 	`
 
 	rows, err := database.DB.Query(query, userID)
+		WHERE restaurant_id = ?
+	`
+
+	rows, err := database.DB.Query(query, resID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query bookings"})
 		return
