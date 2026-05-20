@@ -20,6 +20,8 @@ func SetupRoutes(r *gin.Engine) {
 
 	auth.POST("/booking", handlers.CreateBooking)
 
+	auth.PATCH("/tables/:table_id/status", handlers.UpdateTableStatus)
+	auth.GET("/tables/count", handlers.GetTableCount)
 	auth.GET("/booking/:res_id", handlers.GetBookings)
 	auth.PATCH("/booking/:res_id/:book_id/status", handlers.UpdateBookingStatus)
 	auth.PUT("/booking/:res_id/:book_id/status", handlers.UpdateBookingStatus)
