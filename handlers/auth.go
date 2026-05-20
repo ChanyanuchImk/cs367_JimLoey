@@ -80,3 +80,29 @@ func Login(c *gin.Context) {
 		"token": tokenString,
 	})
 }
+
+type RegisterRequest struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+}
+
+func Register(c *gin.Context) {
+	var req RegisterRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	query := `INSERT INTO USERS (name, email, phone, password) VALUES (?, ?, ?, ?)`
+	_, err := database.DB.Exec(query, req.Name, req.Email, req.Phone, req.Password)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Email already exists"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Register success"})
+}
