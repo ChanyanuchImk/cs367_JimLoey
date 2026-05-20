@@ -121,6 +121,8 @@ func CreateBooking(c *gin.Context) {
 		"number_of_people": req.NumberOfPeople,
 		"status":           "pending",
 	})
+}
+
 type Booking struct {
 	BookingID      int     `json:"booking_id"`
 	UserID         int     `json:"user_id"`
@@ -135,12 +137,50 @@ type Booking struct {
 	CreatedAt      string  `json:"created_at"`
 }
 
-// GET /booking/{user_id}
-func GetBookings(c *gin.Context) {
-	userID := c.Param("user_id")
 // GET /booking/{res_id}
 func GetBookings(c *gin.Context) {
 	resID := c.Param("res_id")
+
+	query := `
+		SELECT booking_id, user_id, restaurant_id, table_id, booking_date, start_time, end_time, number_of_people, total_price, status, created_at
+		FROM BOOKINGS
+		WHERE restaurant_id = ?
+	`
+
+	rows, err := database.DB.Query(query, resID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query bookings"})
+		return
+	}
+	defer rows.Close()
+
+	var bookings []Booking
+	for rows.Next() {
+		var b Booking
+		var tableID *int
+		err := rows.Scan(
+			&b.BookingID, &b.UserID, &b.RestaurantID, &tableID,
+			&b.BookingDate, &b.StartTime, &b.EndTime,
+			&b.NumberOfPeople, &b.TotalPrice, &b.Status, &b.CreatedAt,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse booking data"})
+			return
+		}
+		b.TableID = tableID
+		bookings = append(bookings, b)
+	}
+
+	if bookings == nil {
+		bookings = []Booking{}
+	}
+
+	c.JSON(http.StatusOK, bookings)
+}
+
+// GET /booking/user/{user_id}
+func GetBookingsByUser(c *gin.Context) {
+	userID := c.Param("user_id")
 
 	query := `
 		SELECT booking_id, user_id, restaurant_id, table_id, booking_date, start_time, end_time, number_of_people, total_price, status, created_at
@@ -149,10 +189,6 @@ func GetBookings(c *gin.Context) {
 	`
 
 	rows, err := database.DB.Query(query, userID)
-		WHERE restaurant_id = ?
-	`
-
-	rows, err := database.DB.Query(query, resID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query bookings"})
 		return

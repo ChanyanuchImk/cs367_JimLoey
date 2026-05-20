@@ -28,6 +28,6 @@ func SetupRoutes(r *gin.Engine) {
 	auth.POST("/restaurants", handlers.CreateRestaurant)
 	auth.GET("/bookings/queue", handlers.GetQueues)
 
-	auth.GET("/booking/:user_id", handlers.GetBookings)
+	auth.GET("/booking/user/:user_id", handlers.GetBookingsByUser)
 
 }
