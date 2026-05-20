@@ -3,6 +3,7 @@ package main
 import (
 	"restaurant-api/database"
 	"restaurant-api/routes"
+	"restaurant-api/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -19,6 +20,8 @@ func main() {
 	database.ConnectDB()
 
 	r := gin.Default()
+
+	r.Use(middleware.ErrorHandler())
 
 	routes.SetupRoutes(r)
 

@@ -15,4 +15,11 @@ func SetupRoutes(r *gin.Engine) {
 
 	auth.Use(middleware.AuthMiddleware())
 	auth.GET("/restaurants/:res_id/reports/booking/summary", handlers.GetBookingSummary)
+
+	auth.GET("/booking/:res_id", handlers.GetBookings)
+	auth.PATCH("/booking/:res_id/:book_id/status", handlers.UpdateBookingStatus)
+	auth.PUT("/booking/:res_id/:book_id/status", handlers.UpdateBookingStatus)
+	auth.POST("/restaurants", handlers.CreateRestaurant)
+	auth.GET("/bookings/queue", handlers.GetQueues)
+
 }
