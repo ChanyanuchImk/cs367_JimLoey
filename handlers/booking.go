@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
 	"restaurant-api/database"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
+<<<<<<< HEAD
 type CreateBookingRequest struct {
 	UserID         int    `json:"user_id"`
 	RestaurantID   int    `json:"restaurant_id"`
@@ -123,6 +122,8 @@ func CreateBooking(c *gin.Context) {
 	})
 }
 
+=======
+>>>>>>> 72ad7eb (fix: merge conflict and update routes)
 type Booking struct {
 	BookingID      int     `json:"booking_id"`
 	UserID         int     `json:"user_id"`
@@ -137,6 +138,7 @@ type Booking struct {
 	CreatedAt      string  `json:"created_at"`
 }
 
+<<<<<<< HEAD
 // GET /booking/{res_id}
 func GetBookings(c *gin.Context) {
 	resID := c.Param("res_id")
@@ -146,35 +148,55 @@ func GetBookings(c *gin.Context) {
 		FROM BOOKINGS
 		WHERE restaurant_id = ?
 	`
+=======
+func GetBookingsByUser(c *gin.Context) {
+	userID := c.Param("user_id")
+	query := `SELECT booking_id, user_id, restaurant_id, table_id, booking_date, start_time, end_time, number_of_people, total_price, status, created_at FROM BOOKINGS WHERE user_id = ?`
+	rows, err := database.DB.Query(query, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query bookings"})
+		return
+	}
+	defer rows.Close()
+	var bookings []Booking
+	for rows.Next() {
+		var b Booking
+		err := rows.Scan(&b.BookingID, &b.UserID, &b.RestaurantID, &b.TableID, &b.BookingDate, &b.StartTime, &b.EndTime, &b.NumberOfPeople, &b.TotalPrice, &b.Status, &b.CreatedAt)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse booking data"})
+			return
+		}
+		bookings = append(bookings, b)
+	}
+	if bookings == nil {
+		bookings = []Booking{}
+	}
+	c.JSON(http.StatusOK, bookings)
+}
+>>>>>>> 72ad7eb (fix: merge conflict and update routes)
 
+func GetBookingsByRestaurant(c *gin.Context) {
+	resID := c.Param("res_id")
+	query := `SELECT booking_id, user_id, restaurant_id, table_id, booking_date, start_time, end_time, number_of_people, total_price, status, created_at FROM BOOKINGS WHERE restaurant_id = ?`
 	rows, err := database.DB.Query(query, resID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query bookings"})
 		return
 	}
 	defer rows.Close()
-
 	var bookings []Booking
 	for rows.Next() {
 		var b Booking
-		var tableID *int
-		err := rows.Scan(
-			&b.BookingID, &b.UserID, &b.RestaurantID, &tableID,
-			&b.BookingDate, &b.StartTime, &b.EndTime,
-			&b.NumberOfPeople, &b.TotalPrice, &b.Status, &b.CreatedAt,
-		)
+		err := rows.Scan(&b.BookingID, &b.UserID, &b.RestaurantID, &b.TableID, &b.BookingDate, &b.StartTime, &b.EndTime, &b.NumberOfPeople, &b.TotalPrice, &b.Status, &b.CreatedAt)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse booking data"})
 			return
 		}
-		b.TableID = tableID
 		bookings = append(bookings, b)
 	}
-
 	if bookings == nil {
 		bookings = []Booking{}
 	}
-
 	c.JSON(http.StatusOK, bookings)
 }
 
