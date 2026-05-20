@@ -9,10 +9,10 @@ import (
 
 func SetupRoutes(r *gin.Engine) {
 
-	r.POST("/login", handlers.Login)
+	r.POST("/auth/login", handlers.Login)
 
 	auth := r.Group("/")
 
 	auth.Use(middleware.AuthMiddleware())
-
+	auth.GET("/restaurants/:res_id/reports/booking/summary", handlers.GetBookingSummary)
 }
