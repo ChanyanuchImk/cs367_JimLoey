@@ -10,7 +10,7 @@ import (
 func SetupRoutes(r *gin.Engine) {
 
 	r.POST("/auth/login", handlers.Login)
-
+	r.POST("/auth/register", handlers.Register)
 	auth := r.Group("/")
 
 	auth.Use(middleware.AuthMiddleware())
