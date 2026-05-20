@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-<<<<<<< HEAD
 type CreateBookingRequest struct {
 	UserID         int    `json:"user_id"`
 	RestaurantID   int    `json:"restaurant_id"`
@@ -122,8 +121,6 @@ func CreateBooking(c *gin.Context) {
 	})
 }
 
-=======
->>>>>>> 72ad7eb (fix: merge conflict and update routes)
 type Booking struct {
 	BookingID      int     `json:"booking_id"`
 	UserID         int     `json:"user_id"`
@@ -138,7 +135,6 @@ type Booking struct {
 	CreatedAt      string  `json:"created_at"`
 }
 
-<<<<<<< HEAD
 // GET /booking/{res_id}
 func GetBookings(c *gin.Context) {
 	resID := c.Param("res_id")
@@ -148,7 +144,8 @@ func GetBookings(c *gin.Context) {
 		FROM BOOKINGS
 		WHERE restaurant_id = ?
 	`
-=======
+}
+
 func GetBookingsByUser(c *gin.Context) {
 	userID := c.Param("user_id")
 	query := `SELECT booking_id, user_id, restaurant_id, table_id, booking_date, start_time, end_time, number_of_people, total_price, status, created_at FROM BOOKINGS WHERE user_id = ?`
@@ -173,7 +170,6 @@ func GetBookingsByUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, bookings)
 }
->>>>>>> 72ad7eb (fix: merge conflict and update routes)
 
 func GetBookingsByRestaurant(c *gin.Context) {
 	resID := c.Param("res_id")
