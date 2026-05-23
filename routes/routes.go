@@ -29,13 +29,9 @@ func SetupRoutes(r *gin.Engine) {
 	auth.GET("/tables/count", handlers.GetTableCount)
 	auth.GET("/bookings/queue", handlers.GetQueues)
 
-<<<<<<< HEAD
-	auth.GET("/booking/user/:user_id", handlers.GetBookingsByUser)
-=======
 	// การจัดการสถานะการจอง
 	auth.PATCH("/booking/:res_id/:book_id/status", handlers.UpdateBookingStatus)
 	auth.PUT("/booking/:res_id/:book_id/status", handlers.UpdateBookingStatus)
->>>>>>> 72ad7eb (fix: merge conflict and update routes)
 
 	// สร้างร้านค้าใหม่
 	auth.POST("/restaurants", handlers.CreateRestaurant)

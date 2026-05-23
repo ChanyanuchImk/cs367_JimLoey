@@ -4,6 +4,9 @@ import (
 	"net/http"
 	"restaurant-api/database"
 
+	"database/sql"
+	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -144,6 +147,34 @@ func GetBookings(c *gin.Context) {
 		FROM BOOKINGS
 		WHERE restaurant_id = ?
 	`
+	rows, err := database.DB.Query(query, resID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query bookings"})
+		return
+	}
+	defer rows.Close()
+
+	var bookings []Booking
+	for rows.Next() {
+		var b Booking
+		// Scan ข้อมูลให้ครบตามจำนวน Column ใน SELECT
+		err := rows.Scan(
+			&b.BookingID, &b.UserID, &b.RestaurantID, &b.TableID,
+			&b.BookingDate, &b.StartTime, &b.EndTime,
+			&b.NumberOfPeople, &b.TotalPrice, &b.Status, &b.CreatedAt,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse data"})
+			return
+		}
+		bookings = append(bookings, b)
+	}
+
+	if bookings == nil {
+		bookings = []Booking{}
+	}
+	c.JSON(http.StatusOK, bookings)
+	// ----------------------------------
 }
 
 func GetBookingsByUser(c *gin.Context) {
@@ -193,46 +224,5 @@ func GetBookingsByRestaurant(c *gin.Context) {
 	if bookings == nil {
 		bookings = []Booking{}
 	}
-	c.JSON(http.StatusOK, bookings)
-}
-
-// GET /booking/user/{user_id}
-func GetBookingsByUser(c *gin.Context) {
-	userID := c.Param("user_id")
-
-	query := `
-		SELECT booking_id, user_id, restaurant_id, table_id, booking_date, start_time, end_time, number_of_people, total_price, status, created_at
-		FROM BOOKINGS
-		WHERE user_id = ?
-	`
-
-	rows, err := database.DB.Query(query, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query bookings"})
-		return
-	}
-	defer rows.Close()
-
-	var bookings []Booking
-	for rows.Next() {
-		var b Booking
-		var tableID *int
-		err := rows.Scan(
-			&b.BookingID, &b.UserID, &b.RestaurantID, &tableID,
-			&b.BookingDate, &b.StartTime, &b.EndTime,
-			&b.NumberOfPeople, &b.TotalPrice, &b.Status, &b.CreatedAt,
-		)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse booking data"})
-			return
-		}
-		b.TableID = tableID
-		bookings = append(bookings, b)
-	}
-
-	if bookings == nil {
-		bookings = []Booking{}
-	}
-
 	c.JSON(http.StatusOK, bookings)
 }

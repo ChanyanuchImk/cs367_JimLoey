@@ -3,11 +3,11 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-
 	"restaurant-api/database"
+	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
@@ -94,4 +94,53 @@ func TestLogin_UserNotFound(t *testing.T) {
 	Login(c)
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestRegister_InvalidBody(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest("POST", "/auth/register", bytes.NewBuffer([]byte("invalid json")))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	Register(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestRegister_DuplicateEmail(t *testing.T) {
+	db, mock, _ := sqlmock.New()
+	defer db.Close()
+	database.DB = db
+
+	mock.ExpectExec("INSERT INTO USERS").
+		WithArgs("คุณทดสอบ", "test@email.com", "0812345678", "123456").
+		WillReturnError(fmt.Errorf("duplicate entry"))
+
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	body, _ := json.Marshal(map[string]interface{}{
+		"name": "คุณทดสอบ", "email": "test@email.com",
+		"phone": "0812345678", "password": "123456",
+	})
+	c.Request, _ = http.NewRequest("POST", "/auth/register", bytes.NewBuffer(body))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	Register(c)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestLogin_InvalidBody(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest("POST", "/auth/login", bytes.NewBuffer([]byte("invalid json")))
+	c.Request.Header.Set("Content-Type", "application/json")
+
+	Login(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
