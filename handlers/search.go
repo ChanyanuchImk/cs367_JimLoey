@@ -29,7 +29,7 @@ func SearchRestaurants(c *gin.Context) {
 			phone,
 			open_time,
 			close_time
-		FROM restaurants
+		FROM RESTAURANTS
 		WHERE status = 'active'
 	`
 
@@ -89,8 +89,8 @@ func GetRestaurantDetail(c *gin.Context) {
 		r.close_time,
 		COALESCE(ROUND(AVG(rv.rating),1), 0) AS avg_rating,
 		COUNT(rv.review_id) AS total_reviews
-	FROM restaurants r
-	LEFT JOIN reviews rv
+	FROM RESTAURANTS r
+	LEFT JOIN REVIEWS rv
 		ON r.restaurant_id = rv.restaurant_id
 	WHERE r.restaurant_id = ?
 	GROUP BY r.restaurant_id
